@@ -22,9 +22,10 @@ ControlStripDA class >> example [
 { #category : 'instance creation' }
 ControlStripDA class >> open [
 	"comment stating purpose of class-side method"
+
 	"scope: class-variables  &  class-instance-variables"
 
-	ControlStripDA new open.
+	self new open
 ]
 
 { #category : 'accessing' }
@@ -48,22 +49,21 @@ ControlStripDA >> defaultLayout [
 	output := SpBoxLayout newLeftToRight.
 
 	self buttons do: [ :currentAssociation |
-			| currentBtn currentValue parts clazz foundClass method |
+			| currentBtn currentValue parts clazz method |
 			currentBtn := self newButton.
 			currentBtn label: currentAssociation key.
 			currentBtn action: [
 					currentValue := currentAssociation value.
 					(currentValue isKindOf: Symbol)
-						ifTrue: [ self class perform: (currentValue asSymbol) ]
+						ifTrue: [ self class perform: currentValue asSymbol ]
 						ifFalse: [
 								parts := currentValue splitOn: '#'. "support ClassName#methodName"
 								parts first = ''
 									ifTrue: [ "just #method" clazz := self class ]
-									ifFalse: [ clazz := parts first asSymbol ].
+									ifFalse: [ clazz := Smalltalk at: (parts first asSymbol) ].
 
 								method := parts last asString.
-								foundClass := Smalltalk at: clazz.
-								foundClass perform: method asSymbol ] ].
+								clazz perform: method asSymbol ] ].
 			output add: currentBtn ].
 	^ output
 ]
